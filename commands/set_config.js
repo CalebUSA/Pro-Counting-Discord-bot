@@ -35,6 +35,12 @@ module.exports = {
       type: 10,
       required: true,
     },
+    {
+      name: "count_role",
+      description: "role that will be given on stats complete",
+      type: 8,
+      required: true,
+    },
   ],
   callback: async ({ interaction }) => {
     const { options } = interaction;
@@ -44,11 +50,13 @@ module.exports = {
       const correctRate = options.getNumber("correct_rate");
       const correct = options.getNumber("correct");
       const saves = options.getNumber("saves");
+      const { id: COUNTING_ROLE_ID } = options.getRole("count_role");
 
       data.configuration = {
         correctRate,
         correct,
         saves,
+        COUNTING_ROLE_ID,
       };
 
       fs.writeFileSync(

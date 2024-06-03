@@ -21,12 +21,12 @@ const isCorrectCountMessage = async (message) => {
 const extractValue = (pattern, text, parser = parseFloat) => {
   const match = text.match(pattern);
 
-  return match ? parser(match[1]) : 0;
+  return match ? parser(match[1].replace(/,/g, "")) : 0;
 };
 
 const extractAndCompareUsingRegex = function (text) {
   const correctRate = extractValue(/Correct Rate: \*\*(\d+\.\d+)%\*\*/, text);
-  const correct = extractValue(/✅ \*\*(\d+)\*\*/, text);
+  const correct = extractValue(/✅ \*\*([\d,]+)\*\*/, text);
   const countedSaves = extractValue(/Saves: \*\*(\d+(?:\.\d+)?)\//, text);
 
   const {

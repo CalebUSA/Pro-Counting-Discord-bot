@@ -6,10 +6,11 @@ const {
   generateNoMatchEmbed,
   sendReqNotifyEmbed,
 } = require("../../utils/embed");
+const data = require("./../../data.json");
 
 module.exports = async (message) => {
   try {
-    const { embeds, guild } = message;
+    const { embeds } = message;
 
     const globalStatField = embeds[0]?.data?.fields?.find(
       (field) => field.name === "Global Stats"
@@ -25,17 +26,19 @@ module.exports = async (message) => {
 
     if (isCommand !== "c!user") return;
 
-    let member = referenceMessage.member;
+    const member = referenceMessage.member;
 
-    if (referenceMessage.mentions.parsedUsers.first())
-      member = referenceMessage.mentions.parsedUsers.first();
+    if (
+      referenceMessage.author.id !==
+      (referenceMessage.mentions.parsedUsers.first()?.id ??
+        referenceMessage.author.id)
+    )
+      return;
 
     const isMatch = extractAndCompareUsingRegex(globalStatField.value);
 
-    const cachedMember = guild.members.cache.get(member.id);
-
     if (isMatch !== "match found") {
-      const embed = generateNoMatchEmbed(cachedMember, isMatch);
+      const embed = generateNoMatchEmbed(member, isMatch);
 
       return await referenceMessage.reply({
         embeds: [embed],
@@ -44,20 +47,20 @@ module.exports = async (message) => {
     }
 
     if (isMatch === "match found") {
-      const hasRole = cachedMember.roles.cache.has(
-        process.env.COUNTING_ROLE_ID
+      const hasRole = member.roles.cache.has(
+        data.configuration.COUNTING_ROLE_ID
       );
 
       if (hasRole) return;
 
-      await cachedMember.roles.add(process.env.COUNTING_ROLE_ID);
+      await member.roles.add(data.configuration.COUNTING_ROLE_ID);
 
       await referenceMessage.reply({
-        content: `Congrats! ${cachedMember} has met the requirements and got the role`,
+        content: `Congrats! ${member} has met the requirements and got the role`,
         allowedMentions: { users: [] },
       });
 
-      await sendReqNotifyEmbed(cachedMember);
+      await sendReqNotifyEmbed(member);
     }
   } catch (error) {
     console.log(error);

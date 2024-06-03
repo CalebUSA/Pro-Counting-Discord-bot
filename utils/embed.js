@@ -1,38 +1,35 @@
-const { EmbedBuilder } = require("@discordjs/builders");
+const { EmbedBuilder, channelMention } = require("discord.js");
+const { VOTE_CHANNEL_ID, MAIN_BOT_SERVER_CHANNEL_ID } = process.env;
+const data = require("./../data.json");
 
 const generateNoMatchEmbed = function (user, needed) {
-  const text = "You dont match and you need the following stats";
+  const text = `I'm sorry but you don't meet the counting requirements for Counting Cove. We require at least \`${
+    data.configuration.correctRate
+  } %\`, \`${data.configuration.correct} correctly counted\`, and \`${
+    data.configuration.saves
+  } saves\`. If you need more saves type c!vote in ⁠${channelMention(
+    VOTE_CHANNEL_ID
+  )}. If you need a higher count or percentage you can go to the main counting bot server (found in ⁠${channelMention(
+    MAIN_BOT_SERVER_CHANNEL_ID
+  )}) and raise your stats there then return when you meet the qualifications. Below you can see how much higher stats you need:\n\n**Higher percentage required:** ${needed.correctRate
+    .toFixed(3)
+    .toString()
+    .replace(
+      /(\.0+|0+)$/,
+      ""
+    )} %\n**Higher correct count required:** ${needed.correct
+    .toFixed(3)
+    .toString()
+    .replace(/(\.0+|0+)$/, "")}\n**Higher saves required:** ${needed.saves
+    .toFixed(3)
+    .toString()
+    .replace(/(\.0+|0+)$/, "")}`;
   const embed = new EmbedBuilder()
     .setColor(0x0099ff)
     .setTitle("Requirements Missing")
 
     .setDescription(text)
-    .setThumbnail(user.displayAvatarURL())
-    .addFields(
-      {
-        name: "Correct Rate",
-        value: `${needed.correctRate
-          .toFixed(3)
-          .toString()
-          .replace(/(\.0+|0+)$/, "")} %`,
-        inline: true,
-      },
-      {
-        name: "✅",
-        value: `${needed.correct
-          .toFixed(3)
-          .toString()
-          .replace(/(\.0+|0+)$/, "")}`,
-        inline: true,
-      },
-      {
-        name: "Saves",
-        value: `${needed.saves
-          .toFixed(3)
-          .toString()
-          .replace(/(\.0+|0+)$/, "")}`,
-      }
-    );
+    .setThumbnail(user.displayAvatarURL());
 
   return embed;
 };
@@ -40,7 +37,7 @@ const generateNoMatchEmbed = function (user, needed) {
 const sendReqNotifyEmbed = async (member) => {
   const embed = new EmbedBuilder()
     .setColor(0x0099ff)
-    .setTitle("Requirements Completed 🥗")
+    .setTitle("Counting Role Added 🔢")
 
     .setThumbnail(member.displayAvatarURL())
     .addFields({

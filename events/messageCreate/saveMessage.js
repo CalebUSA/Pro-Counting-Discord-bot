@@ -1,37 +1,43 @@
 const { PermissionsBitField } = require("discord.js");
 const { isCorrectCountMessage } = require("../../utils/count");
 const { sendLockChannelEmbed } = require("../../utils/embed");
-const { COUNTING_CHANNNEL_ID, COUNTING_ROLE_ID, SAVE_ROLE_ID } = process.env;
+const data = require("./../../data.json");
+const { COUNTING_CHANNNEL_ID } = process.env;
 
 module.exports = async (message) => {
   try {
-    const { channel, guild, content } = message;
+    const { channel, content } = message;
 
     if (channel.id !== process.env.COUNTING_CHANNNEL_ID) return;
 
-    const isSaveUsedNotification = content.includes("You have used");
+    const personSaveUsed = content.toLowerCase().includes("your saves");
+    const guildSaveUsed =
+      content.toLowerCase().includes("guild saves") ||
+      content.toLowerCase().includes("ruined it at");
 
-    if (!isSaveUsedNotification) return;
+    if (!personSaveUsed && !guildSaveUsed) return;
 
     const referenceMessage = await isCorrectCountMessage(message);
 
     if (!referenceMessage) return;
 
-    const everyoneRole = guild.roles.everyone;
+    const hasRole = referenceMessage.member.roles.cache.has(
+      data.configuration.COUNTING_ROLE_ID
+    );
 
-    await channel.permissionOverwrites.set([
-      {
-        id: everyoneRole.id,
-        deny: [PermissionsBitField.Flags.SendMessages],
-      },
-    ]);
-
-    const hasRole = referenceMessage.member.roles.cache.has(COUNTING_ROLE_ID);
-
-    if (hasRole) await referenceMessage.member.roles.remove(SAVE_ROLE_ID);
+    if (!guildSaveUsed) return;
 
     // notify
 
+    await channel.permissionOverwrites.set([
+      {
+        id: data.configuration.COUNTING_ROLE_ID,
+        deny: [
+          PermissionsBitField.Flags.SendMessages,
+          PermissionsBitField.Flags.ManageMessages,
+        ],
+      },
+    ]);
     await sendLockChannelEmbed(referenceMessage.member, hasRole);
   } catch (error) {
     console.log(error);

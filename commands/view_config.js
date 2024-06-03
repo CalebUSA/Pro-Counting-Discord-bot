@@ -18,7 +18,7 @@ module.exports = {
     try {
       const { configuration } = data;
 
-      const content = `**Correct Rate Percentage:** ${configuration.correctRate}\n**Correct ✅:** ${configuration.correct}\n**Saves:** ${configuration.saves}`;
+      const content = `**Correct Rate Percentage:** ${configuration.correctRate}\n**Correct ✅:** ${configuration.correct}\n**Saves:** ${configuration.saves}\n**Counting role**: <@&${configuration.COUNTING_ROLE_ID}>`;
 
       await replyOrEditInteraction(interaction, {
         content,
