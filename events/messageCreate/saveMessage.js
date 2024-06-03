@@ -6,7 +6,7 @@ const { COUNTING_CHANNNEL_ID } = process.env;
 
 module.exports = async (message) => {
   try {
-    const { channel, content } = message;
+    const { channel, content, guild } = message;
 
     if (channel.id !== process.env.COUNTING_CHANNNEL_ID) return;
 
@@ -25,11 +25,15 @@ module.exports = async (message) => {
       data.configuration.COUNTING_ROLE_ID
     );
 
+    await referenceMessage.member.roles.remove(
+      data.configuration.COUNTING_ROLE_ID
+    );
     if (!guildSaveUsed) return;
 
     // notify
 
     await channel.permissionOverwrites.set([
+      ...channel.permissionOverwrites.cache.values(),
       {
         id: data.configuration.COUNTING_ROLE_ID,
         deny: [
