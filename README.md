@@ -16,7 +16,7 @@ A discord bot made on the top of https://discord.bots.gg/bots/510016054391734273
 To configure the bot, you need to set the following environment variables in the bot's configuration file:
 
 ```bash
-TOKEN=MTAwNDc0MTI1NzQ1MDQ5MTkwNA.G0ganl.sHoZcLiydllRRCBewkdGn3pHYPapXKB_DAjRg8
+TOKEN=''
 
 COUNTING_BOT_ID=510016054391734273
 
