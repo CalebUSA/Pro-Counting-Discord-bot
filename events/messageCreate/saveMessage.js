@@ -60,10 +60,11 @@ module.exports = async (message) => {
 					if (logChannel) {
 						logChannel.send(removeRoleMessage);
 					}
-					generalMessage = `I'm sorry ${user}, but it looks like you made a mistake in Counting Cove. Your counting role was removed because it appears you don't have enough saves to meet our minimum requirements. To get more saves, you can vote in <#${VOTE_CHANNEL_ID}> then ping an admin or mod when you have enough.`;
+
+					generalMessage = `I'm sorry ${user}, but since you made a mistake counting, you no longer meet the counting requirements for Counting Cove. We require at least \`${data.configuration.correctRate}%\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. To get more saves type c!vote in <#${VOTE_CHANNEL_ID}>. Below you can see how much higher stats you need:\n\n**Higher percentage required:** ${(data.configuration.correctRate).toFixed(3).toString().replace(/(\.0+|0+)$/, "")}%\n**Higher correct count required:** ${(data.configuration.correct).toFixed(3).toString().replace(/(\.0+|0+)$/, "")}\n**Higher saves required:** ${(data.configuration.saves - remainingSaves).toFixed(3).toString().replace(/(\.0+|0+)$/, "")}`;
 				}
 
-				if (generalChannel && generalMessage) {
+				if (generalChannel) {
 					generalChannel.send(generalMessage);
 				}
 			} else {
