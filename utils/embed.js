@@ -34,6 +34,36 @@ const generateNoMatchEmbed = function (user, needed) {
   return embed;
 };
 
+const saveusedembedunder = function (user, needed) {
+  const text = `I'm sorry but since you made a mistake counting, you no longer meet the counting requirements for Counting Cove. We require at least \`${
+    data.configuration.correctRate
+  } %\`, \`${data.configuration.correct} correctly counted\`, and \`${
+    data.configuration.saves
+  } saves\`. To get more saves type c!vote in ⁠${channelMention(
+    VOTE_CHANNEL_ID
+  )}. Below you can see how much higher stats you need:\n\n**Higher percentage required:** ${needed.correctRate
+    .toFixed(3)
+    .toString()
+    .replace(
+      /(\.0+|0+)$/,
+      ""
+    )} %\n**Higher correct count required:** ${needed.correct
+    .toFixed(3)
+    .toString()
+    .replace(/(\.0+|0+)$/, "")}\n**Higher saves required:** ${needed.saves
+    .toFixed(3)
+    .toString()
+    .replace(/(\.0+|0+)$/, "")}`;
+  const embed = new EmbedBuilder()
+    .setColor(0x0099ff)
+    .setTitle("Requirements Missing")
+
+    .setDescription(text)
+    .setThumbnail(user.displayAvatarURL());
+
+  return embed;
+};
+
 const sendReqNotifyEmbed = async (member) => {
   const embed = new EmbedBuilder()
     .setColor(0x0099ff)
