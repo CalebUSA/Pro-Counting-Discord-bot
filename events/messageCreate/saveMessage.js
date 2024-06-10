@@ -53,7 +53,6 @@ module.exports = async (message) => {
 					if (logChannel) {
 						logChannel.send(keepRoleMessage);
 					}
-					generalMessage = `It looks like ${user} made a mistake in Counting Cove, but since they have more than 2 saves left, they get to keep their counting role.`;
 				} else {
 					const removeRoleMessage = "Since they now have less than two saves, we took away the counting role from them.";
 					console.log(removeRoleMessage);
