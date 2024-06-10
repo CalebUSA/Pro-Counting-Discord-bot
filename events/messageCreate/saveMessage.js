@@ -30,9 +30,25 @@ module.exports = async (message) => {
 			data.configuration.COUNTING_ROLE_ID
 		);
 
+		// If it's a personal save, check the remaining saves
+		if (personSaveUsed) {
+			const remainingSavesMatch = content.match(/You have (\d+(\.\d+)?) left/);
+			if (remainingSavesMatch) {
+				const remainingSaves = parseFloat(remainingSavesMatch[1]);
+				if (remainingSaves >= 2) {
+					console.log("User has more than 2 saves left. No action taken.");
+					return;
+				}
+			} else {
+				console.log("Could not find remaining saves in the message.");
+				return;
+			}
+		}
+
 		await referenceMessage.member.roles.remove(
 			data.configuration.COUNTING_ROLE_ID
 		);
+
 		if (!guildSaveUsed) return;
 
 		console.log("removing perms");
