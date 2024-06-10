@@ -1,7 +1,6 @@
 const { PermissionsBitField } = require("discord.js");
 const { isCorrectCountMessage } = require("../../utils/count");
 const { sendLockChannelEmbed } = require("../../utils/embed");
-const { saveusedembedunder } = require("../../utils/embed"); // Add this import
 const data = require("./../../data.json");
 const { COUNTING_CHANNNEL_ID, LOGS_CHANNEL_ID, ADMIN_ROLE, MOD_ROLE, GENERAL_CHANNEL, VOTE_CHANNEL_ID } = process.env;
 
@@ -61,15 +60,11 @@ module.exports = async (message) => {
 					if (logChannel) {
 						logChannel.send(removeRoleMessage);
 					}
-					const needed = {
-						correctRate: data.configuration.correctRate - remainingSaves, // Adjust this calculation as needed
-						correct: data.configuration.correct - remainingSaves, // Adjust this calculation as needed
-						saves: data.configuration.saves - remainingSaves // Adjust this calculation as needed
-					};
-					const generalEmbed = saveusedembedunder(user, needed);
-					if (generalChannel) {
-						generalChannel.send({ embeds: [generalEmbed] });
-					}
+					generalMessage = `I'm sorry ${user}, but it looks like you made a mistake in Counting Cove. Your counting role was removed because it appears you don't have enough saves to meet our minimum requirements. To get more saves, you can vote in <#${VOTE_CHANNEL_ID}> then ping an admin or mod when you have enough.`;
+				}
+
+				if (generalChannel && generalMessage) {
+					generalChannel.send(generalMessage);
 				}
 			} else {
 				console.log("Could not find remaining saves in the message.");
