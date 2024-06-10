@@ -2,7 +2,7 @@ const { PermissionsBitField } = require("discord.js");
 const { isCorrectCountMessage } = require("../../utils/count");
 const { sendLockChannelEmbed } = require("../../utils/embed");
 const data = require("./../../data.json");
-const { COUNTING_CHANNNEL_ID } = process.env;
+const { COUNTING_CHANNNEL_ID, LOGS_CHANNEL_ID } = process.env;
 
 module.exports = async (message) => {
 	try {
@@ -30,14 +30,34 @@ module.exports = async (message) => {
 			data.configuration.COUNTING_ROLE_ID
 		);
 
+		const user = referenceMessage.member.user;
+		const logChannel = guild.channels.cache.get(LOGS_CHANNEL_ID);
+
 		// If it's a personal save, check the remaining saves
 		if (personSaveUsed) {
 			const remainingSavesMatch = content.match(/You have (\d+(\.\d+)?) left/);
 			if (remainingSavesMatch) {
 				const remainingSaves = parseFloat(remainingSavesMatch[1]);
+				const logMessage = `Uh oh! ${user} made a mistake in counting. They have ${remainingSaves} saves left.`;
+
+				console.log(logMessage);
+				if (logChannel) {
+					logChannel.send(logMessage);
+				}
+
 				if (remainingSaves >= 2) {
-					console.log("User has more than 2 saves left. No action taken.");
+					const keepRoleMessage = "Since they now have more than 2 saves, we let them keep the counting role.";
+					console.log(keepRoleMessage);
+					if (logChannel) {
+						logChannel.send(keepRoleMessage);
+					}
 					return;
+				} else {
+					const removeRoleMessage = "Since they now have less than two saves, we took away the counting role from them.";
+					console.log(removeRoleMessage);
+					if (logChannel) {
+						logChannel.send(removeRoleMessage);
+					}
 				}
 			} else {
 				console.log("Could not find remaining saves in the message.");
