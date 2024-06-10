@@ -61,7 +61,7 @@ module.exports = async (message) => {
 						logChannel.send(removeRoleMessage);
 					}
 
-					generalMessage = `I'm sorry ${user}, but since you made a mistake counting, you no longer meet the counting requirements for Counting Cove. We require at least \`${data.configuration.correctRate}%\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. To get more saves type c!vote in <#${VOTE_CHANNEL_ID}>. Below you can see how much higher stats you need:\n\n**Higher percentage required:** ${(data.configuration.correctRate).toFixed(3).toString().replace(/(\.0+|0+)$/, "")}%\n**Higher correct count required:** ${(data.configuration.correct).toFixed(3).toString().replace(/(\.0+|0+)$/, "")}\n**Higher saves required:** ${(data.configuration.saves - remainingSaves).toFixed(3).toString().replace(/(\.0+|0+)$/, "")}`;
+					generalMessage = `I'm sorry ${user}, but since you made a mistake counting, you no longer meet the counting requirements for Counting Cove. We require at least \`${data.configuration.correctRate}%\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. To get more saves type c!vote in <#${VOTE_CHANNEL_ID}>.`;
 				}
 
 				if (generalChannel) {
