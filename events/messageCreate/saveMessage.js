@@ -1,8 +1,9 @@
 const { PermissionsBitField } = require("discord.js");
 const { isCorrectCountMessage } = require("../../utils/count");
 const { sendLockChannelEmbed } = require("../../utils/embed");
+const { saveusedembedunder } = require("../../utils/embed"); // Add this import
 const data = require("./../../data.json");
-const { COUNTING_CHANNNEL_ID, LOGS_CHANNEL_ID, ADMIN_ROLE, MOD_ROLE } = process.env;
+const { COUNTING_CHANNNEL_ID, LOGS_CHANNEL_ID, ADMIN_ROLE, MOD_ROLE, GENERAL_CHANNEL, VOTE_CHANNEL_ID } = process.env;
 
 module.exports = async (message) => {
 	try {
@@ -32,6 +33,7 @@ module.exports = async (message) => {
 
 		const user = referenceMessage.member.user;
 		const logChannel = guild.channels.cache.get(LOGS_CHANNEL_ID);
+		const generalChannel = guild.channels.cache.get(GENERAL_CHANNEL);
 
 		// If it's a personal save, check the remaining saves
 		if (personSaveUsed) {
@@ -45,18 +47,28 @@ module.exports = async (message) => {
 					logChannel.send(logMessage);
 				}
 
+				let generalMessage;
 				if (remainingSaves >= 2) {
 					const keepRoleMessage = "Since they now have more than 2 saves, we let them keep the counting role.";
 					console.log(keepRoleMessage);
 					if (logChannel) {
 						logChannel.send(keepRoleMessage);
 					}
-					return;
+					generalMessage = `It looks like ${user} made a mistake in Counting Cove, but since they have more than 2 saves left, they get to keep their counting role.`;
 				} else {
 					const removeRoleMessage = "Since they now have less than two saves, we took away the counting role from them.";
 					console.log(removeRoleMessage);
 					if (logChannel) {
 						logChannel.send(removeRoleMessage);
+					}
+					const needed = {
+						correctRate: data.configuration.correctRate - remainingSaves, // Adjust this calculation as needed
+						correct: data.configuration.correct - remainingSaves, // Adjust this calculation as needed
+						saves: data.configuration.saves - remainingSaves // Adjust this calculation as needed
+					};
+					const generalEmbed = saveusedembedunder(user, needed);
+					if (generalChannel) {
+						generalChannel.send({ embeds: [generalEmbed] });
 					}
 				}
 			} else {
