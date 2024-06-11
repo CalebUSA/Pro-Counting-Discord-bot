@@ -36,6 +36,7 @@ module.exports = async (message) => {
 
 		// If it's a personal save, check the remaining saves
 		if (personSaveUsed) {
+			console.log("Content of the message: ", content); // Debugging line
 			const remainingSavesMatch = content.match(/You have (\d+(\.\d+)?) left/);
 			if (remainingSavesMatch) {
 				const remainingSaves = parseFloat(remainingSavesMatch[1]);
