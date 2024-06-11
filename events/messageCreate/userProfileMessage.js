@@ -28,7 +28,7 @@ module.exports = async (message) => {
 
         const member = referenceMessage.member;
         const channelId = message.channel.id;
-        const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID);
+        const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID); // Get the role status
 
         const [isCommand] = referenceMessage.content.split(" ");
         if (isCommand !== "c!user") return;
@@ -50,7 +50,7 @@ module.exports = async (message) => {
 
         // Separate logic for AUTO_CHANNEL_ID based on role status
         if (channelId === AUTO_CHANNEL_ID) {
-            if (hasRole) return; // Already has role, no action needed
+            if (hasRole) return; // User already has the role, skip everything
 
             await member.roles.add(data.configuration.COUNTING_ROLE_ID);
             await referenceMessage.reply({
