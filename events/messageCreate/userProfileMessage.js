@@ -7,7 +7,7 @@ const {
     sendReqNotifyEmbed,
 } = require("../../utils/embed");
 const data = require("./../../data.json");
-const { AUTO_CHANNEL_ID, LOGS_CHANNEL_ID, VOTE_CHANNEL_ID, GENERAL_CHANNEL } = process.env; // Pull AUTO_CHANNEL_ID, LOGS_CHANNEL_ID, VOTE_CHANNEL_ID, and GENERAL_CHANNEL from environment variables
+const { AUTO_CHANNEL_ID, LOGS_CHANNEL_ID, VOTE_CHANNEL_ID, GENERAL_CHANNEL, MOD_COMMANDS_CHANNEL } = process.env; // Pull AUTO_CHANNEL_ID, LOGS_CHANNEL_ID, VOTE_CHANNEL_ID, GENERAL_CHANNEL, and MOD_COMMANDS_CHANNEL from environment variables
 const { EmbedBuilder } = require('discord.js');
 
 module.exports = async (message) => {
@@ -103,6 +103,19 @@ module.exports = async (message) => {
                     embeds: [embed],
                     allowedMentions: { users: [member.id] },
                 });
+
+                // Log the potential counter to LOGS_CHANNEL_ID
+                const logChannel = message.guild.channels.cache.get(LOGS_CHANNEL_ID);
+                if (logChannel) {
+                    const dateTime = new Date().toLocaleString();
+                    const logEmbed = new EmbedBuilder()
+                        .setColor(0xffa500)
+                        .setTitle("Potential Counter")
+                        .setDescription(`${member} potentially qualifies for counting. They seem to have the stats required when they ran the command on ${dateTime}. If you do grant them access, don't forget to run \`c!user ${member}\` in <#${MOD_COMMANDS_CHANNEL}> to ensure that I calculated it right. Remember, our server requires at least \`${data.configuration.correctRate} %\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. Thank you for your help.`);
+
+                    await logChannel.send({ embeds: [logEmbed] });
+                    console.log(`Logged potential counter for ${member} at ${dateTime}`); // Log the message to the console
+                }
             }
         }
     } catch (error) {
