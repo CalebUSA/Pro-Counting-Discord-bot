@@ -34,7 +34,7 @@ module.exports = async (message) => {
         // Check if the user has the counting role
         const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID);
 
-        if (channelId === AUTO_CHANNEL_ID) {
+        if (channelId === AUTO_CHANNEL_ID || channelId === VOTE_CHANNEL_ID) {
             const [isCommand] = referenceMessage.content.split(" ");
 
             if (isCommand !== "c!user") return;
@@ -111,7 +111,7 @@ module.exports = async (message) => {
                     const logEmbed = new EmbedBuilder()
                         .setColor(0xffa500)
                         .setTitle("Potential Counter")
-                        .setDescription(`${member} potentially qualifies for counting. They seem to have the stats required when they ran the command on ${dateTime}. If you do grant them access, don't forget to run c!user ${member.displayName} in <#${MOD_COMMANDS_CHANNEL}> to ensure that I calculated it right. Remember, our server requires at least \`${data.configuration.correctRate}%\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. Thank you for your help.`);
+                        .setDescription(`${member} potentially qualifies for counting. They seem to have the stats required when they ran the command on ${dateTime}. If you do grant them access, don't forget to run c!user @${member.displayName} in <#${MOD_COMMANDS_CHANNEL}> to ensure that I calculated it right. Remember, our server requires at least \`${data.configuration.correctRate}%\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. Thank you for your help.`);
 
                     await logChannel.send({ embeds: [logEmbed] });
                     console.log(`Logged potential counter for ${member.displayName} at ${dateTime}`); // Log the message to the console
