@@ -10,6 +10,8 @@ const data = require("./../../data.json");
 const { AUTO_CHANNEL_ID, LOGS_CHANNEL_ID, VOTE_CHANNEL_ID, GENERAL_CHANNEL, MOD_COMMANDS_CHANNEL } = process.env;
 const { EmbedBuilder } = require('discord.js');
 
+const processedUsers = new Set();
+
 module.exports = async (message) => {
     try {
         if (![AUTO_CHANNEL_ID, VOTE_CHANNEL_ID].includes(message.channel.id)) {
@@ -47,6 +49,14 @@ module.exports = async (message) => {
                 allowedMentions: { users: [] },
             });
         }
+
+        // Check if the user has already been processed
+        if (processedUsers.has(member.id)) {
+            return; // User already processed, stop execution
+        }
+
+        // Mark user as processed
+        processedUsers.add(member.id);
 
         // Separate logic for AUTO_CHANNEL_ID based on role status
         if (channelId === AUTO_CHANNEL_ID) {
