@@ -27,6 +27,7 @@ module.exports = async (message) => {
         if (!referenceMessage) return;
 
         const member = referenceMessage.member;
+        const channelId = message.channel.id; // Ensure channelId is defined
         const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID); // Get the role status
 
         if (hasRole) {
