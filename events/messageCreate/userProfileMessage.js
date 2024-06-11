@@ -7,11 +7,11 @@ const {
     sendReqNotifyEmbed,
 } = require("../../utils/embed");
 const data = require("./../../data.json");
+const { AUTO_CHANNEL_ID } = process.env; // Pull AUTO_CHANNEL_ID from environment variables
 
 module.exports = async (message) => {
     try {
-        const allowedChannelId = "821743124116144169"; // Replace with the actual ID
-        if (message.channel.id !== allowedChannelId) {
+        if (message.channel.id !== AUTO_CHANNEL_ID) {
             return; // Stop execution if not in the correct channel
         }
         
