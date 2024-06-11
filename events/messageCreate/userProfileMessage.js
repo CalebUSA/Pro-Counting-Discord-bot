@@ -7,7 +7,7 @@ const {
     sendReqNotifyEmbed,
 } = require("../../utils/embed");
 const data = require("./../../data.json");
-const { AUTO_CHANNEL_ID } = process.env; // Pull AUTO_CHANNEL_ID from environment variables
+const { AUTO_CHANNEL_ID, LOGS_CHANNEL_ID } = process.env; // Pull AUTO_CHANNEL_ID and LOGS_CHANNEL_ID from environment variables
 
 module.exports = async (message) => {
     try {
@@ -66,6 +66,14 @@ module.exports = async (message) => {
             });
 
             await sendReqNotifyEmbed(member);
+
+            const logChannel = message.guild.channels.cache.get(LOGS_CHANNEL_ID);
+            if (logChannel) {
+                const botName = message.client.user.username; // Get the bot's name
+                const logMessage = `${member} was granted access to the counting channel by ${botName}.`;
+                await logChannel.send(logMessage);
+                console.log(logMessage); // Log the message to the console
+            }
         }
     } catch (error) {
         console.log(error);
