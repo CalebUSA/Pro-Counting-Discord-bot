@@ -27,8 +27,11 @@ module.exports = async (message) => {
         if (!referenceMessage) return;
 
         const member = referenceMessage.member;
-        const channelId = message.channel.id;
         const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID); // Get the role status
+
+        if (hasRole) {
+            return; // User already has the role, skip everything
+        }
 
         const [isCommand] = referenceMessage.content.split(" ");
         if (isCommand !== "c!user") return;
@@ -50,8 +53,6 @@ module.exports = async (message) => {
 
         // Separate logic for AUTO_CHANNEL_ID based on role status
         if (channelId === AUTO_CHANNEL_ID) {
-            if (hasRole) return; // User already has the role, skip everything
-
             await member.roles.add(data.configuration.COUNTING_ROLE_ID);
             await referenceMessage.reply({
                 content: `Congrats! ${member} has met the requirements and got the role`,
@@ -67,7 +68,7 @@ module.exports = async (message) => {
                 console.log(logMessage); 
             }
         } 
-        // Separate logic for VOTE_CHANNEL_ID (always assumes no role)
+        // Separate logic for VOTE_CHANNEL_ID
         else if (channelId === VOTE_CHANNEL_ID) {
             // User meets the stats but won't be granted the role automatically
             const embed = new EmbedBuilder()
