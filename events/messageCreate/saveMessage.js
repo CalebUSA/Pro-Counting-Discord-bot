@@ -64,9 +64,6 @@ module.exports = async (message) => {
                generalMessage = `I'm sorry ${user}, but since you made a mistake counting, you no longer meet the counting requirements for Counting Cove. We require at least \`${data.configuration.correctRate}%\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. To get more saves type c!vote in <#${VOTE_CHANNEL_ID}>.`;
             }
 
-            if (generalChannel) {
-               generalChannel.send(generalMessage);
-            }
          } else {
             console.log("Could not find remaining saves in the message.");
             return;
