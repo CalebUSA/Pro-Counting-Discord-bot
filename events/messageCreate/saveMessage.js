@@ -10,7 +10,7 @@ module.exports = async (message) => {
 
       if (channel.id !== process.env.COUNTING_CHANNNEL_ID) return;
 
-      console.log("Message received in counting channel");
+      console.log(`"${content}" was sent in the counting channel`);
       const personSaveUsed = content.toLowerCase().includes("your saves");
       const guildSaveUsed =
          content.toLowerCase().includes("guild saves") ||
@@ -77,30 +77,29 @@ module.exports = async (message) => {
          data.configuration.COUNTING_ROLE_ID
       );
 
-      if (!guildSaveUsed) return;
+      if (guildSaveUsed) {
+         console.log("removing perms");
 
-      console.log("removing perms");
+         // notify
+         await channel.permissionOverwrites.set([
+            ...channel.permissionOverwrites.cache.values(),
+            {
+               id: data.configuration.COUNTING_ROLE_ID,
+               deny: [
+                  PermissionsBitField.Flags.SendMessages,
+                  PermissionsBitField.Flags.ManageMessages,
+               ],
+            },
+         ]);
 
-      // notify
+         const adminRole = guild.roles.cache.get(ADMIN_ROLE);
+         const modRole = guild.roles.cache.get(MOD_ROLE);
+         const guildSaveMessage = `${adminRole} ${modRole} ${user} used a guild save! I locked the channel from the counting role but please check the channel asap to see if someone is trying to ruin our count.`;
 
-      await channel.permissionOverwrites.set([
-         ...channel.permissionOverwrites.cache.values(),
-         {
-            id: data.configuration.COUNTING_ROLE_ID,
-            deny: [
-               PermissionsBitField.Flags.SendMessages,
-               PermissionsBitField.Flags.ManageMessages,
-            ],
-         },
-      ]);
-
-      const adminRole = guild.roles.cache.get(ADMIN_ROLE);
-      const modRole = guild.roles.cache.get(MOD_ROLE);
-      const guildSaveMessage = `${adminRole} ${modRole} ${user} used a guild save! I locked the channel from the counting role but please check the channel asap to see if someone is trying to ruin our count.`;
-
-      console.log(guildSaveMessage);
-      if (logChannel) {
-         logChannel.send(guildSaveMessage);
+         console.log(guildSaveMessage);
+         if (logChannel) {
+            logChannel.send(guildSaveMessage);
+         }
       }
 
       await sendLockChannelEmbed(referenceMessage.member, hasRole);
