@@ -10,7 +10,7 @@ module.exports = async (message) => {
 
       if (channel.id !== process.env.COUNTING_CHANNNEL_ID) return;
 
-      console.log(`"${content}" was sent in the counting channel`);
+      console.log(`"${content}" was sent in the counting channel by "${user}"`);
       const personSaveUsed = content.toLowerCase().includes("your saves");
       const guildSaveUsed =
          content.toLowerCase().includes("guild saves") ||
