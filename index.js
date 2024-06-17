@@ -25,6 +25,8 @@ client.on("ready", async (readyClient) => {
   } catch (err) {
     console.log(err);
   }
+
+  // Initialize wokcommands
   new WOK({
     client,
     commandsDir: path.join(__dirname, "./commands"),
@@ -46,4 +48,5 @@ client.on("ready", async (readyClient) => {
     },
   });
 });
+
 client.login(TOKEN);
