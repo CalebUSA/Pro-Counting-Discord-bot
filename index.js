@@ -46,7 +46,18 @@ client.on("ready", async (readyClient) => {
       botOwnersBypass: false,
       dbRequired: 300,
     },
+  }).on('commandException', (command, error) => {
+    console.error(`Command "${command}" encountered an error: ${error}`);
+  }).on('commandLoaded', (command) => {
+    console.log(`Command "${command}" has been loaded successfully`);
   });
+
+  console.log("WOKCommands initialized");
+
+  // Register commands (this will vary based on your actual setup)
+  // Ensure the commands are loaded and registered
+  await client.application.commands.set(await client.commands);
+  console.log("Commands have been registered");
 });
 
 client.login(TOKEN);
