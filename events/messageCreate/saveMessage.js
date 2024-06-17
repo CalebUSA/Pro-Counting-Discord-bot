@@ -52,8 +52,7 @@ module.exports = async (message) => {
                     const keepRoleMessage = "Since they now have more than 2 saves, we let them keep the counting role.";
                     console.log(keepRoleMessage);
                     if (logChannel) {
-                        logChannel.send(keepRoleMessage)
-                        return;
+                        logChannel.send(keepRoleMessage);
                     }
                 } else {
                     const removeRoleMessage = "Since they now have less than two saves, we took away the counting role from them.";
@@ -71,8 +70,6 @@ module.exports = async (message) => {
                     // Remove the role since they have fewer than two saves left
                     await referenceMessage.member.roles.remove(
                         data.configuration.COUNTING_ROLE_ID
-                        return;
-                        
                     );
                 }
 
@@ -105,9 +102,9 @@ module.exports = async (message) => {
             if (logChannel) {
                 logChannel.send(guildSaveMessage);
             }
-        }
 
-        await sendLockChannelEmbed(referenceMessage.member, hasRole);
+            await sendLockChannelEmbed(referenceMessage.member, hasRole);
+        }
     } catch (error) {
         console.log(error);
     }
