@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
+console.log("say.js command file loaded");
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('say')
@@ -13,6 +15,7 @@ module.exports = {
                 .setDescription('The channel to send the message to')),
     
     callback: async (interaction) => {
+        console.log("say command executed");
         const messageContent = interaction.options.getString('message');
         const targetChannel = interaction.options.getChannel('channel') || interaction.channel;
 
