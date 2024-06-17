@@ -8,7 +8,7 @@ module.exports = async (message) => {
     try {
         const { channel, content, guild, author } = message;
 
-        if (channel.id !== process.env.COUNTING_CHANNNEL_ID) return;
+        if (channel.id !== COUNTING_CHANNNEL_ID) return;
 
         console.log(`"${content}" was sent in the counting channel by ${author.username} (${author.id})`);
         const personSaveUsed = content.toLowerCase().includes("your saves");
@@ -62,6 +62,15 @@ module.exports = async (message) => {
                     }
 
                     generalMessage = `I'm sorry ${user.username} (${user.id}), but since you made a mistake counting, you no longer meet the counting requirements for Counting Cove. We require at least \`${data.configuration.correctRate}%\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. To get more saves type c!vote in <#${VOTE_CHANNEL_ID}>.`;
+
+                    if (generalChannel) {
+                        generalChannel.send(generalMessage);
+                    }
+
+                    // Remove the role since they have fewer than two saves left
+                    await referenceMessage.member.roles.remove(
+                        data.configuration.COUNTING_ROLE_ID
+                    );
                 }
 
             } else {
@@ -69,10 +78,6 @@ module.exports = async (message) => {
                 return;
             }
         }
-
-        await referenceMessage.member.roles.remove(
-            data.configuration.COUNTING_ROLE_ID
-        );
 
         if (guildSaveUsed) {
             console.log("removing perms");
