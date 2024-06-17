@@ -36,10 +36,10 @@ module.exports = async (message) => {
             console.log(`Saves value for ${member.displayName}: ${saves}`);
 
             if (saves < 1.5) {
-                await member.roles.remove(data.configuration.COUNTING_ROLE_ID);
+//                await member.roles.remove(data.configuration.COUNTING_ROLE_ID);
                 await referenceMessage.react('❌');
-                await message.channel.send({
-                    content: `${member}, it looks like you are falling behind on saves. Please go to <#${VOTE_CHANNEL_ID}> and do \`c!vote\`. Once you get more saves, ask for perms to count again in <#${GENERAL_CHANNEL}>.`,
+//                await message.channel.send({
+//                   content: `${member}, it looks like you are falling behind on saves. Please go to <#${VOTE_CHANNEL_ID}> and do \`c!vote\`. Once you get more saves, ask for perms to count again in <#${GENERAL_CHANNEL}>.`,
                     allowedMentions: { users: [member.id] },
                 });
                 return; // Return here if saves < 1.5
