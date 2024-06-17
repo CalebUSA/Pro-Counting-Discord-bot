@@ -53,7 +53,7 @@ module.exports = async (message) => {
                     console.log(keepRoleMessage);
                     if (logChannel) {
                         logChannel.send(keepRoleMessage)
-                            return;
+                        return;
                     }
                 } else {
                     const removeRoleMessage = "Since they now have less than two saves, we took away the counting role from them.";
