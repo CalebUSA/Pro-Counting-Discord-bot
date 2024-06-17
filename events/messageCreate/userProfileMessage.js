@@ -31,6 +31,24 @@ module.exports = async (message) => {
         
         // Log the user's stats to the console even if they have the role
         const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID); // Get the role status
+        
+        // Use the same extraction method as in extractAndCompareUsingRegex
+        const logUserStats = () => {
+            // Extract and log the 'saves' from globalStatField.value
+            const extractValue = (pattern, text, parser = parseFloat) => {
+                const match = text.match(pattern);
+                return match ? parser(match[1].replace(/,/g, "")) : 0;
+            };
+
+            const countedSaves = extractValue(/Saves: \*\*(\d+(?:\.\d+)?)\//, globalStatField.value);
+            console.log(`${member.displayName} has ${countedSaves} saves.`);
+        };
+
+        logUserStats();
+
+        if (hasRole) {
+            return; // User already has the role, skip everything else but log stats
+        }
 
         const [isCommand] = referenceMessage.content.split(" ");
         if (isCommand !== "c!user") return;
@@ -43,19 +61,6 @@ module.exports = async (message) => {
 
         const isMatch = extractAndCompareUsingRegex(globalStatField.value);
         
-        const logUserStats = () => {
-            // Extract and log the 'saves' from globalStatField.value
-            const savesMatch = globalStatField.value.match(/saves: (\d+)/);
-            const saves = savesMatch ? savesMatch[1] : '0';
-            console.log(`${member.displayName} has ${saves} saves.`);
-        };
-
-        logUserStats();
-        
-        if (hasRole) {
-            return; // User already has the role, skip everything else but log stats
-        }
-
         if (isMatch !== "match found") {
             const embed = generateNoMatchEmbed(member, isMatch);
             return await referenceMessage.reply({
