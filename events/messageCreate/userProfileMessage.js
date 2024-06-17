@@ -33,6 +33,8 @@ module.exports = async (message) => {
         // Check saves for users with the role
         if (hasRole) {
             const saves = parseFloat(globalStatField.value.match(/Saves:\s*(\d+(\.\d+)?)/)?.[1] || 0);
+            console.log(`Saves value for ${member.displayName}: ${saves}`); // Added console.log statement
+
             if (saves < 1.5) {
                 await member.roles.remove(data.configuration.COUNTING_ROLE_ID);
                 await referenceMessage.react('❌');
