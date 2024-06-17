@@ -21,7 +21,9 @@ module.exports = async (message) => {
             (field) => field.name === "Global Stats"
         );
 
-        if (!globalStatField) return;
+        const voteStatField = embeds[0]?.description; // Check the description for c!vote saves
+
+        if (!globalStatField && !voteStatField) return;
 
         const referenceMessage = await isCorrectCountMessage(message);
         if (!referenceMessage) return;
@@ -37,16 +39,21 @@ module.exports = async (message) => {
             return match ? parser(match[1].replace(/,/g, "")) : 0;
         };
 
-        const countedSaves = extractValue(/Saves: \*\*(\d+(?:\.\d+)?)\//, globalStatField.value);
+        let countedSaves = 0;
+        if (globalStatField) {
+            countedSaves = extractValue(/Saves: \*\*(\d+(?:\.\d+)?)\//, globalStatField.value);
+        } else if (voteStatField) {
+            countedSaves = extractValue(/You currently have (\d+(?:\.\d+)?)/, voteStatField);
+        }
+
         console.log(`${member.displayName} has ${countedSaves} saves.`);
         
         if (hasRole) {
-            if (countedSaves > 10.5) {
+            if (countedSaves > 1.5) {
                 // React with a check mark if saves > 1.5
                 await message.react('✅');
             } else {
                 // Remove role and notify if saves <= 1.5
-                await message.react('❌');
                 await member.roles.remove(data.configuration.COUNTING_ROLE_ID);
                 const logChannel = message.guild.channels.cache.get(LOGS_CHANNEL_ID);
                 const botName = message.client.user.username;
