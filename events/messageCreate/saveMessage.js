@@ -52,7 +52,8 @@ module.exports = async (message) => {
                     const keepRoleMessage = "Since they now have more than 2 saves, we let them keep the counting role.";
                     console.log(keepRoleMessage);
                     if (logChannel) {
-                        logChannel.send(keepRoleMessage);
+                        logChannel.send(keepRoleMessage)
+                            return;
                     }
                 } else {
                     const removeRoleMessage = "Since they now have less than two saves, we took away the counting role from them.";
@@ -61,7 +62,7 @@ module.exports = async (message) => {
                         logChannel.send(removeRoleMessage);
                     }
 
-                    generalMessage = `I'm sorry ${user.username} (${user.id}), but since you made a mistake counting, you no longer meet the counting requirements for Counting Cove. We require at least \`${data.configuration.correctRate}%\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. To get more saves type c!vote in <#${VOTE_CHANNEL_ID}>.`;
+                    generalMessage = `I'm sorry <@${user.id}>, but since you made a mistake counting, you no longer meet the counting requirements for Counting Cove. We require at least \`${data.configuration.correctRate}%\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. To get more saves type c!vote in <#${VOTE_CHANNEL_ID}>.`;
 
                     if (generalChannel) {
                         generalChannel.send(generalMessage);
@@ -70,6 +71,8 @@ module.exports = async (message) => {
                     // Remove the role since they have fewer than two saves left
                     await referenceMessage.member.roles.remove(
                         data.configuration.COUNTING_ROLE_ID
+                        return;
+                        
                     );
                 }
 
