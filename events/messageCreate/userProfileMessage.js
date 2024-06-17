@@ -33,7 +33,7 @@ module.exports = async (message) => {
     // Check saves for users with the role
     if (hasRole) {
       const saves = parseFloat(globalStatField.value.match(/Saves:\s*(\d+(\.\d+)?)/)?.[1] || 0);
-      if (saves < 0.5) {
+      if (saves > 0.5) {
         await member.roles.remove(data.configuration.COUNTING_ROLE_ID);
         await message.react('❌');
         await message.channel.send({
