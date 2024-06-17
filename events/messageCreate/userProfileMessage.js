@@ -28,11 +28,9 @@ module.exports = async (message) => {
 
         const member = referenceMessage.member;
         const channelId = message.channel.id; // Ensure channelId is defined
+        
+        // Log the user's stats to the console even if they have the role
         const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID); // Get the role status
-
-        if (hasRole) {
-            return; // User already has the role, skip everything
-        }
 
         const [isCommand] = referenceMessage.content.split(" ");
         if (isCommand !== "c!user") return;
@@ -44,6 +42,20 @@ module.exports = async (message) => {
             return;
 
         const isMatch = extractAndCompareUsingRegex(globalStatField.value);
+        
+        const logUserStats = () => {
+            // Extract and log the 'saves' from globalStatField.value
+            const savesMatch = globalStatField.value.match(/saves: (\d+)/);
+            const saves = savesMatch ? savesMatch[1] : '0';
+            console.log(`${member.displayName} has ${saves} saves.`);
+        };
+
+        logUserStats();
+        
+        if (hasRole) {
+            return; // User already has the role, skip everything else but log stats
+        }
+
         if (isMatch !== "match found") {
             const embed = generateNoMatchEmbed(member, isMatch);
             return await referenceMessage.reply({
