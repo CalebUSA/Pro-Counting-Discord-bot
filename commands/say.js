@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { PermissionsBitField } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -13,7 +12,7 @@ module.exports = {
             option.setName('channel')
                 .setDescription('The channel to send the message to')),
     
-    async execute(interaction) {
+    callback: async (interaction) => {
         const messageContent = interaction.options.getString('message');
         const targetChannel = interaction.options.getChannel('channel') || interaction.channel;
 
