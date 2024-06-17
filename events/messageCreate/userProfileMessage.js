@@ -41,7 +41,7 @@ module.exports = async (message) => {
         console.log(`${member.displayName} has ${countedSaves} saves.`);
         
         if (hasRole) {
-            if (countedSaves > 1.5) {
+            if (countedSaves > 10.5) {
                 // React with a check mark if saves > 1.5
                 await message.react('✅');
             } else {
