@@ -1,119 +1,51 @@
-const {
-    isCorrectCountMessage,
-    extractAndCompareUsingRegex,
-} = require("../../utils/count");
-const {
-    generateNoMatchEmbed,
-    sendReqNotifyEmbed,
-} = require("../../utils/embed");
-const data = require("./../../data.json");
-const { AUTO_CHANNEL_ID, LOGS_CHANNEL_ID, VOTE_CHANNEL_ID, GENERAL_CHANNEL, MOD_COMMANDS_CHANNEL } = process.env;
-const { EmbedBuilder } = require('discord.js');
+const data = require("./../data.json");
 
-module.exports = async (message) => {
-    try {
-        if (![AUTO_CHANNEL_ID, VOTE_CHANNEL_ID].includes(message.channel.id)) {
-            return; // Stop execution if not in the correct channels
-        }
+const isCorrectCountMessage = async (message) => {
+  const {
+    author: { bot, id },
+    reference,
+    guild,
+  } = message;
 
-        const { embeds } = message;
-        const globalStatField = embeds[0]?.data?.fields?.find(
-            (field) => field.name === "Global Stats"
-        );
+  if (!bot || id !== process.env.COUNTING_BOT_ID) return;
 
-        if (!globalStatField) return;
+  if (!reference) return;
 
-        const referenceMessage = await isCorrectCountMessage(message);
-        if (!referenceMessage) return;
+  const fetchedMessage = await guild.channels.cache
+    .get(reference.channelId)
+    .messages.fetch(reference.messageId);
 
-        const member = referenceMessage.member;
-        const channelId = message.channel.id; // Ensure channelId is defined
-        
-        // Log the user's stats to the console even if they have the role
-        const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID); // Get the role status
-        
-        // Use the same extraction method as in extractAndCompareUsingRegex
-        const logUserStats = () => {
-            // Extract and log the 'saves' from globalStatField.value
-            const extractValue = (pattern, text, parser = parseFloat) => {
-                const match = text.match(pattern);
-                return match ? parser(match[1].replace(/,/g, "")) : 0;
-            };
-
-            const countedSaves = extractValue(/Saves: \*\*(\d+(?:\.\d+)?)\//, globalStatField.value);
-            console.log(`${member.displayName} has ${countedSaves} saves.`);
-        };
-
-        logUserStats();
-
-        if (hasRole) {
-            return; // User already has the role, skip everything else but log stats
-        }
-
-        const [isCommand] = referenceMessage.content.split(" ");
-        if (isCommand !== "c!user") return;
-        if (
-            referenceMessage.author.id !==
-            (referenceMessage.mentions.parsedUsers.first()?.id ??
-                referenceMessage.author.id)
-        )
-            return;
-
-        const isMatch = extractAndCompareUsingRegex(globalStatField.value);
-        
-        if (isMatch !== "match found") {
-            const embed = generateNoMatchEmbed(member, isMatch);
-            return await referenceMessage.reply({
-                embeds: [embed],
-                allowedMentions: { users: [] },
-            });
-        }
-
-        // Separate logic for AUTO_CHANNEL_ID based on role status
-        if (channelId === AUTO_CHANNEL_ID) {
-            await member.roles.add(data.configuration.COUNTING_ROLE_ID);
-            await referenceMessage.reply({
-                content: `Congrats! ${member} has met the requirements and got the role`,
-                allowedMentions: { users: [] },
-            });
-            await sendReqNotifyEmbed(member);
-
-            const logChannel = message.guild.channels.cache.get(LOGS_CHANNEL_ID);
-            if (logChannel) {
-                const botName = message.client.user.username;
-                const logMessage = `${member} was granted access to the counting channel by ${botName}.`;
-                await logChannel.send(logMessage);
-                console.log(logMessage); 
-            }
-        } 
-        // Separate logic for VOTE_CHANNEL_ID
-        else if (channelId === VOTE_CHANNEL_ID) {
-            // User meets the stats but won't be granted the role automatically
-            const embed = new EmbedBuilder()
-                .setColor(0x0099ff)
-                .setTitle("Potential Eligibility for Counting Cove")
-                .setDescription(`You may meet the stats required for the Counting Cove. If you would like to join, please ping a mod or admin in <#${GENERAL_CHANNEL}>. Please note: Whether you are granted access or not is ultimately up to the admins of the server and their decision is final.`)
-                .setThumbnail(member.displayAvatarURL());
-
-            await referenceMessage.reply({
-                embeds: [embed],
-                allowedMentions: { users: [member.id] },
-            });
-
-            // Log the potential counter to LOGS_CHANNEL_ID
-            const logChannel = message.guild.channels.cache.get(LOGS_CHANNEL_ID);
-            if (logChannel) {
-                const dateTime = Math.floor(Date.now() / 1000); 
-                const logEmbed = new EmbedBuilder()
-                    .setColor(0xffa500)
-                    .setTitle("Potential Counter")
-                    .setDescription(`${member} potentially qualifies for counting. They seem to have the stats required when they ran the command on <t:${dateTime}:F>. If you do grant them access, don't forget to run c!user @${member.displayName} in <#${MOD_COMMANDS_CHANNEL}> to ensure that I calculated it right. Remember, our server requires at least \`${data.configuration.correctRate}%\`, \`${data.configuration.correct} correctly counted\`, and \`${data.configuration.saves} saves\`. Thank you for your help.`);
-
-                await logChannel.send({ embeds: [logEmbed] });
-                console.log(`Logged potential counter for ${member.displayName} at <t:${dateTime}:F>`); 
-            }
-        }
-    } catch (error) {
-        console.log(error);
-    }
+  return fetchedMessage;
 };
+
+const extractValue = (pattern, text, parser = parseFloat) => {
+  const match = text.match(pattern);
+
+  return match ? parser(match[1].replace(/,/g, "")) : 0;
+};
+
+const extractAndCompareUsingRegex = function (text) {
+  const correctRate = extractValue(/Correct Rate: \*\*(\d+\.\d+)%\*\*/, text);
+  const correct = extractValue(/✅ \*\*([\d,]+)\*\*/, text);
+  const countedSaves = extractValue(/Saves: \*\*(\d+(?:\.\d+)?)\//, text);
+
+  const {
+    correctRate: targetRate,
+    correct: targetCorrect,
+    saves: targetSaves,
+  } = data.configuration;
+
+  const needed = {
+    correctRate: Math.max(0, targetRate - correctRate),
+    correct: Math.max(0, targetCorrect - correct),
+    saves: Math.max(0, targetSaves - countedSaves),
+  };
+
+  if (needed.correctRate > 0 || needed.correct > 0 || needed.saves > 0) {
+    return needed;
+  }
+
+  return "match found";
+};
+
+module.exports = { isCorrectCountMessage, extractAndCompareUsingRegex };
