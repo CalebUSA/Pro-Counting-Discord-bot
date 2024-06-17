@@ -31,22 +31,18 @@ module.exports = async (message) => {
         const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID); // Get the role status
 
         // Check saves for users with the role
-// Check saves for users with the role
-            if (hasRole) {
-                const saves = parseFloat(globalStatField.value.match(/Saves:\s*(\d+(\.\d+)?)/)?.[1] || 0);
-                if (saves < 1.5) {
-                    await member.roles.remove(data.configuration.COUNTING_ROLE_ID);
-                    await referenceMessage.react('❌');
-                    await message.channel.send({
-                        content: `${member}, it looks like you are falling behind on saves. Please go to <#${VOTE_CHANNEL_ID}> and do \`c!vote\`. Once you get more saves, ask for perms to count again in <#${GENERAL_CHANNEL}>.`,
-                        allowedMentions: { users: [member.id] },
-                    });
-                    return; // Return here if saves < 1.5
-                }
-                // If saves >= 1.5, don't do anything and continue
+        if (hasRole) {
+            const saves = parseFloat(globalStatField.value.match(/Saves:\s*(\d+(\.\d+)?)/)?.[1] || 0);
+            if (saves < 1.5) {
+                await member.roles.remove(data.configuration.COUNTING_ROLE_ID);
+                await referenceMessage.react('❌');
+                await message.channel.send({
+                    content: `${member}, it looks like you are falling behind on saves. Please go to <#${VOTE_CHANNEL_ID}> and do \`c!vote\`. Once you get more saves, ask for perms to count again in <#${GENERAL_CHANNEL}>.`,
+                    allowedMentions: { users: [member.id] },
+                });
+                return; // Return here if saves < 1.5
             }
-                }
-            return; // Skip further processing for users with the role
+            // If saves >= 1.5, don't do anything and continue
         }
 
         const [isCommand] = referenceMessage.content.split(" ");
