@@ -27,11 +27,40 @@ module.exports = async (message) => {
         if (!referenceMessage) return;
 
         const member = referenceMessage.member;
-        const channelId = message.channel.id; // Ensure channelId is defined
-        const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID); // Get the role status
+        const channelId = message.channel.id;
+        const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID);
 
+        // New Check: Saves for Role Holders
         if (hasRole) {
-            return; // User already has the role, skip everything
+            const isMatch = extractAndCompareUsingRegex(globalStatField.value);
+
+            if (!isMatch.includes("match found")) {
+                // Invalid stats format, no action needed
+                return; 
+            }
+
+            const savesMatch = isMatch.match(/Saves:\s*(\d+)/);
+            const saves = savesMatch ? parseInt(savesMatch[1]) : 0;
+            
+            if (saves < 1.5) { 
+                await member.roles.remove(data.configuration.COUNTING_ROLE_ID);
+
+                const removalMessage = `You no longer meet the requirements to stay in the counting channel. Please head to <#${VOTE_CHANNEL_ID}> and vote to rejoin.`;
+                await referenceMessage.reply({
+                    content: removalMessage,
+                    allowedMentions: { users: [] }
+                });
+
+                const logChannel = message.guild.channels.cache.get(LOGS_CHANNEL_ID);
+                if (logChannel) {
+                    const logMessage = `${member} was removed from the counting channel due to insufficient saves.`;
+                    await logChannel.send(logMessage);
+                    console.log(logMessage); 
+                }
+            }
+
+            // No further action for role holders with sufficient saves
+            return;
         }
 
         const [isCommand] = referenceMessage.content.split(" ");
@@ -52,7 +81,7 @@ module.exports = async (message) => {
             });
         }
 
-        // Separate logic for AUTO_CHANNEL_ID based on role status
+        // Separate logic for AUTO_CHANNEL_ID
         if (channelId === AUTO_CHANNEL_ID) {
             await member.roles.add(data.configuration.COUNTING_ROLE_ID);
             await referenceMessage.reply({
