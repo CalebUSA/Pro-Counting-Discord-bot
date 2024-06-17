@@ -35,7 +35,7 @@ module.exports = async (message) => {
             const saves = parseFloat(globalStatField.value.match(/Saves:\s*(\d+(\.\d+)?)/)?.[1] || 0);
             if (saves < 10.5) {
                 await member.roles.remove(data.configuration.COUNTING_ROLE_ID);
-                await referenceMessage.react('❌');
+                await message.react('❌');
                 await message.channel.send({
                     content: `${member}, it looks like you are falling behind on saves. Please go to <#${VOTE_CHANNEL_ID}> and do \`c!vote\`. Once you get more saves, ask for perms to count again in <#${GENERAL_CHANNEL}>.`,
                     allowedMentions: { users: [member.id] },
