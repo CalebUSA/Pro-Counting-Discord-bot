@@ -29,25 +29,41 @@ module.exports = async (message) => {
         const member = referenceMessage.member;
         const channelId = message.channel.id; // Ensure channelId is defined
         
-        // Log the user's stats to the console even if they have the role
         const hasRole = member.roles.cache.has(data.configuration.COUNTING_ROLE_ID); // Get the role status
-        
-        // Use the same extraction method as in extractAndCompareUsingRegex
-        const logUserStats = () => {
-            // Extract and log the 'saves' from globalStatField.value
-            const extractValue = (pattern, text, parser = parseFloat) => {
-                const match = text.match(pattern);
-                return match ? parser(match[1].replace(/,/g, "")) : 0;
-            };
 
-            const countedSaves = extractValue(/Saves: \*\*(\d+(?:\.\d+)?)\//, globalStatField.value);
-            console.log(`${member.displayName} has ${countedSaves} saves.`);
+        // Use the same extraction method as in extractAndCompareUsingRegex
+        const extractValue = (pattern, text, parser = parseFloat) => {
+            const match = text.match(pattern);
+            return match ? parser(match[1].replace(/,/g, "")) : 0;
         };
 
-        logUserStats();
-
+        const countedSaves = extractValue(/Saves: \*\*(\d+(?:\.\d+)?)\//, globalStatField.value);
+        console.log(`${member.displayName} has ${countedSaves} saves.`);
+        
         if (hasRole) {
-            return; // User already has the role, skip everything else but log stats
+            if (countedSaves > 1.5) {
+                // React with a check mark if saves > 1.5
+                await message.react('✅');
+            } else {
+                // Remove role and notify if saves <= 1.5
+                await message.react('❌');
+                await member.roles.remove(data.configuration.COUNTING_ROLE_ID);
+                const logChannel = message.guild.channels.cache.get(LOGS_CHANNEL_ID);
+                const botName = message.client.user.username;
+                const logMessage = `${member.displayName} had their role removed because they had less than 1.5 saves.`;
+                
+                if (logChannel) {
+                    await logChannel.send(logMessage);
+                }
+
+                console.log(logMessage);
+
+                // Notify the user in the channel
+                await message.channel.send(
+                    `${member}, I'm sorry but it appears you need more saves. Please vote in <#${VOTE_CHANNEL_ID}> by typing \`c!vote\`. Then, once you get your saves back, ask for access in <#${GENERAL_CHANNEL}>. Thanks for understanding!`
+                );
+            }
+            return; // Skip everything else if the user already had the role
         }
 
         const [isCommand] = referenceMessage.content.split(" ");
@@ -60,7 +76,7 @@ module.exports = async (message) => {
             return;
 
         const isMatch = extractAndCompareUsingRegex(globalStatField.value);
-        
+
         if (isMatch !== "match found") {
             const embed = generateNoMatchEmbed(member, isMatch);
             return await referenceMessage.reply({
