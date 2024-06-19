@@ -15,10 +15,7 @@ module.exports = async (message) => {
         if (![AUTO_CHANNEL_ID, VOTE_CHANNEL_ID].includes(message.channel.id)) {
             return; // Stop execution if not in the correct channels
         }
-        // Check if the command is exactly "c!user"
-        const isCommand = message.content.trim();
-        if (isCommand !== "c!user") return; // Ensure the command is exactly "c!user"
-        
+
         const { embeds } = message;
         const globalStatField = embeds[0]?.data?.fields?.find(
             (field) => field.name === "Global Stats"
