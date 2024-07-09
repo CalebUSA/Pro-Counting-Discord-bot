@@ -14,7 +14,10 @@ const {
   VC_CHANNEL,
   USED_GUILD_SAVE_ROLE,
   NO_USER_SAVE_ROLE,
-} = process.env; // Added USED_GUILD_SAVE_ROLE and NO_USER_SAVE_ROLE
+  USED_GUILD_SAVE_ROLE_GENERAL,
+  USED_GUILD_SAVE_ROLE_COUNTING,
+  USED_GUILD_SAVE_ROLE_KORLAND,
+} = process.env;
 
 module.exports = async (message) => {
   try {
@@ -127,13 +130,22 @@ module.exports = async (message) => {
       channel.send(countingChannelBroadcastMessage);
     }
 
-    // Add USED_GUILD_SAVE_ROLE to the user
-    const usedGuildSaveRole = guild.roles.cache.get(USED_GUILD_SAVE_ROLE);
-    if (usedGuildSaveRole) {
-      await referenceMessage.member.roles.add(usedGuildSaveRole);
-      console.log(`Added USED_GUILD_SAVE_ROLE to ${user.username} (${user.id})`);
-    } else {
-      console.error(`USED_GUILD_SAVE_ROLE not found: ${USED_GUILD_SAVE_ROLE}`);
+    // Add roles to the user
+    const rolesToAdd = [
+      USED_GUILD_SAVE_ROLE,
+      USED_GUILD_SAVE_ROLE_GENERAL,
+      USED_GUILD_SAVE_ROLE_COUNTING,
+      USED_GUILD_SAVE_ROLE_KORLAND,
+    ];
+
+    for (const roleId of rolesToAdd) {
+      const role = guild.roles.cache.get(roleId);
+      if (role) {
+        await referenceMessage.member.roles.add(role);
+        console.log(`Added ${role.name} to ${user.username} (${user.id})`);
+      } else {
+        console.error(`Role not found: ${roleId}`);
+      }
     }
 
     // Check if the user has the MOD_ROLE and remove it if they do
