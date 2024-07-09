@@ -108,7 +108,7 @@ module.exports = async (message) => {
     const countingBotRole = guild.roles.cache.get(data.configuration.COUNTING_ROLE_ID);
     if (countingBotRole && countingChannel) {
       await countingChannel.permissionOverwrites.edit(countingBotRole, {
-        VIEW_CHANNEL: false,
+        [PermissionsBitField.Flags.ViewChannel]: false,
       });
       console.log(`Updated view channel permissions for counting bot in ${COUNTING_CHANNNEL_ID}`);
     }
