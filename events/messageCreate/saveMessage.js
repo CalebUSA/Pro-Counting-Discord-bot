@@ -44,8 +44,10 @@ module.exports = async (message) => {
     const user = referenceMessage.member.user;
 
     const logChannel = guild.channels.cache.get(LOGS_CHANNEL_ID);
+    const countingChannel = guild.channels.cache.get(COUNTING_CHANNNEL_ID);
 
     console.log(`Log Channel ID: ${LOGS_CHANNEL_ID}, Fetched: ${!!logChannel}`);
+    console.log(`Counting Channel ID: ${COUNTING_CHANNNEL_ID}, Fetched: ${!!countingChannel}`);
 
     if (personSaveUsed) {
       console.log("Content of the message: ", content);
@@ -98,6 +100,15 @@ module.exports = async (message) => {
     }
 
     if (!guildSaveUsed) return;
+
+    // Change view channel permissions for the counting bot
+    const countingBotRole = guild.roles.cache.get(data.configuration.COUNTING_ROLE_ID);
+    if (countingBotRole && countingChannel) {
+      await countingChannel.permissionOverwrites.edit(countingBotRole, {
+        VIEW_CHANNEL: false,
+      });
+      console.log(`Updated view channel permissions for counting bot in ${COUNTING_CHANNNEL_ID}`);
+    }
 
     const guildSaveMessage = `${user.username} used a guild save!! Attention needed to maintain the count integrity.`;
     logChannel?.send(guildSaveMessage);
